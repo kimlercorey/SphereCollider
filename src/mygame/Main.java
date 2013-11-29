@@ -48,6 +48,11 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
  private String lastA ="";
  private String lastB="";
  
+ private int numberOfStartingSpheres = 3;
+ private float sphereOffset = 1.5f;
+ 
+ 
+ 
  
  private Box mainbox;
  private Geometry boxGeometry;   
@@ -68,23 +73,19 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
   Material floor_mat;
   
   /** bounciness **/
- float bounciness = 1.1f;
+ float bounciness = .95f;
  
   /** Prepare geometries and physical nodes for bricks and cannon balls. */
-  private RigidBodyControl    brick_phy;
-  private static final Box    box;
+  //private RigidBodyControl    brick_phy;
+  //private static final Box    box;
   private RigidBodyControl    ball_phy;
   private static final Sphere sphere;
   private RigidBodyControl    floor_phy;
   private static final Box    floor;
   
-  /** dimensions used for bricks and wall */
-  private static final float brickLength = 0.48f;
-  private static final float brickWidth  = 0.24f;
-  private static final float brickHeight = 0.12f;
  
    // Iteration (a bit of abstraction from ticks)
-  private static final Integer maxIterations = 1000;
+  private static final Integer maxIterations = 100000;
   private static final Integer ticksPerIteration = 1;
   private Integer ic = 0;
   private Integer tic = 0;
@@ -100,8 +101,8 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     bulletCollisionShape = new SphereCollisionShape(1.4f);
    
     /** Initialize the brick geometry */
-    box = new Box(brickLength, brickHeight, brickWidth);
-    box.scaleTextureCoordinates(new Vector2f(1f, .5f));
+    //box = new Box(brickLength, brickHeight, brickWidth);
+    //box.scaleTextureCoordinates(new Vector2f(1f, .5f));
     /** Initialize the floor geometry */
     floor = new Box(100f, 0.1f, 50f);
     floor.scaleTextureCoordinates(new Vector2f(3, 6));
@@ -129,13 +130,29 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     numberOfObjectsInScene = 0;
     BitmapTextArray = new BitmapText[100];
 
-    Node HUD = guiNode;
     initMaterials();
     initFloor();
     initBox();
-    initHUD(HUD);
+    initHUD(guiNode);
+    initSPhereGenerator();
+    
     };
 
+    
+    private void initSPhereGenerator(){
+    
+        for (int i = 0; i < numberOfStartingSpheres; i++) 
+        {
+        
+        Vector3f vec = new Vector3f(-0.0025268048f, -0.9980558f+(i*sphereOffset), -0.062275767f);    
+        makeCannonBall(vec);
+        
+        }
+    
+    };
+    
+    
+    
  /**
    * Every time the shoot action is triggered, a new cannon ball is produced.
    * The ball is set up to fly from the camera position in the camera direction.
@@ -143,7 +160,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
   private ActionListener actionListener = new ActionListener() {
     public void onAction(String name, boolean keyPressed, float tpf) {
       if (name.equals("shoot") && !keyPressed) {
-        makeCannonBall();
+        //makeCannonBall();
       }
     }
   };
@@ -240,7 +257,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
         boxMaterial.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Front);
         boxMaterial.setTexture("ColorMap", boxTexture);
         boxGeometry.setMaterial(boxMaterial);
-        boxGeometry.setLocalTranslation(0.0f, -2.0f, 0.0f);
+        boxGeometry.setLocalTranslation(0.0f, 15.0f, 0.0f);
 
         // physics for the box
         CollisionShape boxShape = CollisionShapeFactory.createMeshShape(boxGeometry);
@@ -260,7 +277,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     wall_mat.setTexture("ColorMap", tex);
  
     stone_mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-    TextureKey key2 = new TextureKey("Textures/Terrain/Rock/Rock.PNG");
+    TextureKey key2 = new TextureKey("Textures/grid_red_white.jpg");
     key2.setGenerateMips(true);
     Texture tex2 = assetManager.loadTexture(key2);
     stone_mat.setTexture("ColorMap", tex2);
@@ -291,7 +308,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
   /** This method creates one individual physical cannon ball.
    * By defaul, the ball is accelerated and flies
    * from the camera position in the camera direction.*/
-   public void makeCannonBall() {
+   public void makeCannonBall(Vector3f vec) {
     /** Create a cannon ball geometry and attach to scene graph. */
     Geometry ball_geo = new Geometry( "sphere"+numberOfObjectsInScene, sphere);
     ball_geo.setMaterial(stone_mat);
@@ -309,7 +326,8 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     bulletAppState.getPhysicsSpace().add(ball_phy);
     /** Accelerate the physcial ball to shoot it. */
     ball_phy.setRestitution(bounciness);
-    ball_phy.setLinearVelocity(cam.getDirection().mult(25));
+    //ball_phy.setLinearVelocity(cam.getDirection().mult(25));
+    ball_phy.setLinearVelocity(vec.mult(50));
     StatDisplayer(guiNode, ball_geo.getName(), numberOfObjectsInScene);
   }
   
@@ -365,7 +383,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
          }    
          
          System.out.println("boom!! "+nodea.getName()+" and "+nodeb.getName());
-         
+         System.out.println(cam.getDirection().toString());
          addCollisionToQueue(nodea.getName(),nodeb.getName());
          
          
