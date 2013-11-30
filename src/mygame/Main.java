@@ -73,7 +73,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
   Material floor_mat;
   
   /** bounciness **/
- float bounciness = .95f;
+ float bounciness = .99f;
  
   /** Prepare geometries and physical nodes for bricks and cannon balls. */
   //private RigidBodyControl    brick_phy;
@@ -104,9 +104,9 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     //box = new Box(brickLength, brickHeight, brickWidth);
     //box.scaleTextureCoordinates(new Vector2f(1f, .5f));
     /** Initialize the floor geometry */
-    floor = new Box(100f, 0.1f, 50f);
+    floor = new Box(70f, 0.1f, 70f);
     floor.scaleTextureCoordinates(new Vector2f(3, 6));
-
+ 
   }
  
     
@@ -116,10 +116,10 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
 /** Set up Physics Game */
     bulletAppState = new BulletAppState();
     stateManager.attach(bulletAppState);
-    bulletAppState.setDebugEnabled(true);
+    //bulletAppState.setDebugEnabled(true);
  
     /** Configure cam to look at scene */
-    cam.setLocation(new Vector3f(0, 4f, 6f));
+    cam.setLocation(new Vector3f(6f, 16f, 6f));
     cam.lookAt(new Vector3f(2, 2, 0), Vector3f.UNIT_Y);
     /** Add InputManager action: Left click triggers shooting. */
     inputManager.addMapping("shoot", 
@@ -134,18 +134,18 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     initFloor();
     initBox();
     initHUD(guiNode);
-    initSPhereGenerator();
+    initSphereGenerator();
     
     };
 
     
-    private void initSPhereGenerator(){
+    private void initSphereGenerator(){
     
         for (int i = 0; i < numberOfStartingSpheres; i++) 
         {
         
-        Vector3f vec = new Vector3f(-0.0025268048f, -0.9980558f+(i*sphereOffset), -0.062275767f);    
-        makeCannonBall(vec);
+        //Vector3f vec = new Vector3f(2, 2+(i*sphereOffset), 0);    
+        makeCannonBall( new Vector3f(2, 2+(i*sphereOffset), 0));
         
         }
     
@@ -161,6 +161,8 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     public void onAction(String name, boolean keyPressed, float tpf) {
       if (name.equals("shoot") && !keyPressed) {
         //makeCannonBall();
+        initSphereGenerator();
+          
       }
     }
   };
@@ -244,7 +246,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
   public void initBox() {
 
         // create a box
-        mainbox = new Box(7.0f, 20.0f, 7.0f);
+        mainbox = new Box(7.0f, 16.0f, 7.0f);
 
         boxGeometry = new Geometry("Box", mainbox);
         boxMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -283,12 +285,13 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     stone_mat.setTexture("ColorMap", tex2);
  
     floor_mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-    TextureKey key3 = new TextureKey("Textures/Terrain/Pond/Pond.jpg");
+    TextureKey key3 = new TextureKey("Textures/floor.jpg");
     key3.setGenerateMips(true);
     Texture tex3 = assetManager.loadTexture(key3);
+    
     tex3.setWrap(WrapMode.Repeat);
-    //floor_mat.setTexture("ColorMap", tex3);
-     floor_mat.setColor("Color", ColorRGBA.Gray);// .setColor("ColorMap", new ColorRGBA(1f,0f,1f, 1f));
+    floor_mat.setTexture("ColorMap", tex3);
+    //floor_mat.setColor("Color", ColorRGBA.Gray);// .setColor("ColorMap", new ColorRGBA(1f,0f,1f, 1f));
     
   }
  
@@ -297,9 +300,14 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     Geometry floor_geo = new Geometry("Floor", floor);
     floor_geo.setMaterial(floor_mat);
     floor_geo.setLocalTranslation(0, -0.1f, 0);
+    floor_geo.setLocalScale(.1f);
+    //floor_geo.scaleTextureCoordinates(new Vector2f(10f, 10f));
+   
     this.rootNode.attachChild(floor_geo);
     /* Make the floor physical with mass 0.0f! */
     floor_phy = new RigidBodyControl(0.0f);
+    
+    //floor_phy.scaleTextureCoordinates(new Vector2f(10f, 10f));
     floor_geo.addControl(floor_phy);
     floor_phy.setRestitution(bounciness);
     bulletAppState.getPhysicsSpace().add(floor_phy);
@@ -327,7 +335,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
     /** Accelerate the physcial ball to shoot it. */
     ball_phy.setRestitution(bounciness);
     //ball_phy.setLinearVelocity(cam.getDirection().mult(25));
-    ball_phy.setLinearVelocity(vec.mult(50));
+    ball_phy.setLinearVelocity(vec.mult(100));
     StatDisplayer(guiNode, ball_geo.getName(), numberOfObjectsInScene);
   }
   
@@ -388,7 +396,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener{
          
          
         } catch (Exception e) {
-            //nothing
+            // dreams computers compute when asked "do nothing"
         }
     };
     
