@@ -405,6 +405,13 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
 
                 collisionCount += 1;
                 System.out.println("Collision detected between " + nodea.getName() + " and " + nodeb.getName());
+                // Write to output file
+                //File Output
+                try {
+                outputFile.write("Collision detected between " + nodea.getName() + " and " + nodeb.getName());
+                outputFile.newLine();
+                } catch (IOException e) {  
+                }
                 addCollisionToQueue(nodea.getName(), nodeb.getName());
             }
 
@@ -419,5 +426,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     };
 
 }
+
+
 
 
