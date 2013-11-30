@@ -25,19 +25,23 @@ import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.collision.shapes.SphereCollisionShape;
 import com.jme3.scene.Spatial;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
- * Shere Collider
- *
- * @author kc < kimler (at) gmail (dot) com>
- */
+* Shere Collider
+*
+* @author kc < kimler (at) gmail (dot) com>
+* @author Bryan J. VerHoven
+*/
 public class Main extends SimpleApplication implements PhysicsCollisionListener {
 
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
     }
-    // text padding   
+    // text padding
     private int tp = 20;
     private int minimumNumberOfSpheresToBeginCountingIterations = 3;
     private BitmapText[] BitmapTextArray;
@@ -62,7 +66,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     Material wall_mat;
     Material stone_mat;
     Material floor_mat;
-// bounciness 
+// bounciness
     float bounciness = .9f;
     private RigidBodyControl ball_phy;
     private static final Sphere sphere;
@@ -76,6 +80,10 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     private Integer tic = 0;
     // true to count collisions with floor
     private Boolean includeFloorCollisions = false;
+    //output file
+    public static BufferedWriter outputFile;
+    
+    
 
     static {
         // Sphere shape and information
@@ -83,9 +91,15 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         sphere.setTextureMode(TextureMode.Projected);
         sphereCollisionShape = new SphereCollisionShape(1.4f);
 
-        // Create floor 
+        // Create floor
         floor = new Box(70f, 0.1f, 70f);
         floor.scaleTextureCoordinates(new Vector2f(3, 6));
+        
+        //File Output
+        try {
+        outputFile = new BufferedWriter(new FileWriter("SphereColliderOutputFile.txt"));
+        } catch (IOException e) {  
+        }
     }
 
     @Override
@@ -110,7 +124,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
 
         // Use these to track
         numberOfObjectsInScene = 0;
-        BitmapTextArray = new BitmapText[100];
+        BitmapTextArray = new BitmapText[100];  
 
         // get it all running
         initMaterials();
@@ -146,10 +160,10 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
     };
   
- /** updateHUD() 
-  *  Updates any items in the HUD that need to be tracked
-  * 
-   */
+ /** updateHUD()
+* Updates any items in the HUD that need to be tracked
+*
+*/
   public void trackSpheres() {
 
         int count = BitmapTextArray.length;
@@ -193,8 +207,8 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         if (BitmapTextArray[num] == null && name != "") {
 
             /**
-             * Item is new so create a new hud stat for it *
-             */
+* Item is new so create a new hud stat for it *
+*/
             statDisplayer = new BitmapText(guiFont, false);
             collisionDisplayer = new BitmapText(guiFont, false);
 
@@ -206,15 +220,22 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
             BitmapTextArray[num] = statDisplayer;
         } else {
             /**
-             * Item exists so read and update the stat *
-             */
+* Item exists so read and update the stat *
+*/
             statDisplayer = BitmapTextArray[num];
             statDisplayer.removeFromParent();
             statDisplayer.setSize(guiFont.getCharSet().getRenderedSize());
             statDisplayer.setText(name + ": {X: " + getXof(name) + "} {Y:" + getYof(name) + "} {Z:" + getZof(name) + "}");
             System.out.println("Tracking " + name + ": {X: " + getXof(name) + "} {Y:" + getYof(name) + "} {Z:" + getZof(name) + "}");
+            // Write to output file
+            //File Output
+            try {
+            outputFile.write("Tracking " + name + ": {X: " + getXof(name) + "} {Y:" + getYof(name) + "} {Z:" + getZof(name) + "}");
+            outputFile.newLine();
+            } catch (IOException e) {  
+            }
             guiNode.attachChild(statDisplayer);
-
+            
             try {
                 collisionDisplayer.removeFromParent();
                 collisionDisplayer.setSize(guiFont.getCharSet().getRenderedSize() * 2);
@@ -280,8 +301,8 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     };
 
     /**
-     * Make a solid floor and add it to the scene.
-     */
+* Make a solid floor and add it to the scene.
+*/
     public void initFloor() {
         Geometry floor_geo = new Geometry("Floor", floor);
         floor_geo.setMaterial(floor_mat);
@@ -315,7 +336,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
 
         ball_geo.addControl(ball_phy);
         bulletAppState.getPhysicsSpace().add(ball_phy);
-        // Make it bouncy 
+        // Make it bouncy
         ball_phy.setRestitution(bounciness);
         //ball_phy.setLinearVelocity(cam.getDirection().mult(25));
         ball_phy.setLinearVelocity(vec.mult(100));
@@ -343,7 +364,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
 
         // if we have not finished the total iterations
         if (ic < maxIterations) {
-            //increment the ticks 
+            //increment the ticks
             tic++;
             // if the ticks are maxed then reset and increment the count
             if (tic > ticksPerIteration) {
@@ -394,7 +415,9 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     
     
     public void addCollisionToQueue(String a, String b) {
-        // not yet implemented    
+        // not yet implemented
     };
 
 }
+
+
