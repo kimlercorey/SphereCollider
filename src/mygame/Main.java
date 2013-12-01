@@ -83,7 +83,6 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     //output file
     public static BufferedWriter outputFile;
     
-    
 
     static {
         // Sphere shape and information
@@ -367,10 +366,13 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         
         try {
             
+            System.out.println("After "+ic+" iterations, "+finalObjectCount+" objects collided "+collisionCount+" times.");
             outputFile.write("After "+ic+" iterations, "+finalObjectCount+" objects collided "+collisionCount+" times.");
 
             outputFile.flush();
             outputFile.close();
+            
+            stop();
             
         } catch (IOException e) { /* dont report on errors */ }
 
