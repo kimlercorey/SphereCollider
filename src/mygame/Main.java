@@ -352,16 +352,31 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
 
         if (totalIterationsComplete()) {
             // end it all
-            bulletAppState.getPhysicsSpace().removeAll(rootNode);
-            try {
-                outputFile.flush();
-                outputFile.close();
-            } catch (IOException e) { /* dont report on errors */ }
+            bulletAppState.getPhysicsSpace().removeAll(rootNode);            
+            finalResults();
         } else {
             trackSpheres();
         }
     };
 
+    private void finalResults(){
+    
+        Integer finalCollisionCount = collisionCount;
+        Integer finalIterationCount = ic;
+        Integer finalObjectCount = numberOfObjectsInScene;
+        
+        try {
+            
+            outputFile.write("After "+ic+" iterations, "+finalObjectCount+" objects collided "+collisionCount+" times.");
+
+            outputFile.flush();
+            outputFile.close();
+            
+        } catch (IOException e) { /* dont report on errors */ }
+
+                
+    };
+    
     private Boolean totalIterationsComplete() {
         Boolean isComplete = false;
 
