@@ -30,7 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
-* Shere Collider
+* Sphere Collider
 *
 * @author kc < kimler (at) gmail (dot) com>
 * @author Bryan J. VerHoven
@@ -46,7 +46,7 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
     private int minimumNumberOfSpheresToBeginCountingIterations = 3;
     private BitmapText[] BitmapTextArray;
     // Collision tracking
-    private Integer collisionCount = 0;
+    private Integer collisionCount;
     // private String[] CollisionArray;
     private String lastA = null;
     private String lastB = null;
@@ -100,6 +100,10 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         outputFile = new BufferedWriter(new FileWriter("SphereColliderOutputFile.txt"));
         } catch (IOException e) {  
         }
+    }
+
+    public Main() {
+        this.collisionCount = 0;
     }
 
     @Override
@@ -349,6 +353,10 @@ public class Main extends SimpleApplication implements PhysicsCollisionListener 
         if (totalIterationsComplete()) {
             // end it all
             bulletAppState.getPhysicsSpace().removeAll(rootNode);
+            try {
+                outputFile.flush();
+                outputFile.close();
+            } catch (IOException e) { /* dont report on errors */ }
         } else {
             trackSpheres();
         }
